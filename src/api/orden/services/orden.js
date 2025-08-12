@@ -289,7 +289,7 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
           });
           
           onRollback(() => {
-            console.log("roll back");
+            console.log("Se aplica rollback");
           });
 
         });
@@ -337,9 +337,14 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
           
           for(const item of ordenesConEstadoDeCobroReal){
 
-            //cobro real pendiente o cancelado
-            if(item.res.value == "pending" || item.res.value == "canceled"){
-              
+            //cobro real pendiente -> se cancela el cobro real y la orden queda candelada
+            if(item.res.value == "pending"){
+             await strapi.service("api::pasarelas.khipu").cancelarCobro(item.orden); 
+             await this.cambiarEstadoOrden(item.orden.documentId,"cancelada");
+            }
+
+            //cobro real cancelado
+            if(item.res.value == "canceled"){
              await this.cambiarEstadoOrden(item.orden.documentId,"cancelada");
             }
 

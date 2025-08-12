@@ -28,8 +28,6 @@ module.exports = {
       
       const response = await strapi.service("api::pasarelas.khipu").crearCobro(ordenCreada,metodoDePagoKhipu);
 
-      console.log(response)
-
       await strapi.documents("api::orden.orden").update({
         documentId:ordenCreada.documentId,
         data:{

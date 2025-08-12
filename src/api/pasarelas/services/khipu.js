@@ -105,14 +105,18 @@ module.exports = {
       
     },
 
-
-
-
-     async cancelarCobro(orden) {
+    async cancelarCobro(orden) {
 
       const apiKey = orden.metodos_de_pago.configuracion.apiKey;
-      const url = `${orden.metodos_de_pago.configuracion.apiUrl}/payments/6hjuk8pjf1uh`;
+      let url = "";
       
+      if(orden.payment_id){
+        console.log(`Se cancelara el cobro del ID :${orden.payment_id}`)
+        url = `${orden.metodos_de_pago.configuracion.apiUrl}/payments/${orden.payment_id}`
+      }else{
+        throw new ApplicationError("La orden no tiene un id de cobro para cancelar el pago real");
+      }
+
       try {
         const response = await fetch(url, {
         method: "DELETE",
@@ -125,11 +129,11 @@ module.exports = {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Error Khipu: ${response.status} - ${errorText}`);
+        console.log(`Error Khipu: ${response.status} - ${errorText}`);
       }
 
       const responseData = await response.json();
-      console.log(responseData);
+      return responseData;
 
       } catch (error) {
         console.error("Error eliminando cobro", error);

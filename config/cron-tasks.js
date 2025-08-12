@@ -4,7 +4,6 @@ const { ApplicationError } = errors;
 module.exports = {
 
 
-
   myJob: {
     task: async ({ strapi }) => {
       try {
@@ -19,8 +18,4 @@ module.exports = {
       rule: "*/5 * * * * *",
     },
   },
-
-
-
-  
 };
