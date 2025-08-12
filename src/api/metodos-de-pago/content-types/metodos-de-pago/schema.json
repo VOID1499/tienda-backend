@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "metodos_de_pagos",
+  "info": {
+    "singularName": "metodos-de-pago",
+    "pluralName": "metodos-de-pagos",
+    "displayName": "metodos_de_pago"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "activo": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "configuracion": {
+      "type": "json",
+      "private": true,
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "url_logo": {
+      "type": "string"
+    },
+    "informacion_adicional": {
+      "type": "text"
+    },
+    "ordens": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::orden.orden",
+      "mappedBy": "metodos_de_pago"
+    }
+  }
+}

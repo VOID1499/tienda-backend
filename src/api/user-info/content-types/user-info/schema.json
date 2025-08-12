@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_infos",
+  "info": {
+    "singularName": "user-info",
+    "pluralName": "user-infos",
+    "displayName": "user_info"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true
+    },
+    "apellidos": {
+      "type": "string",
+      "required": true
+    },
+    "rut": {
+      "type": "string",
+      "required": false,
+      "unique": true
+    },
+    "telefono": {
+      "type": "string"
+    }
+  }
+}

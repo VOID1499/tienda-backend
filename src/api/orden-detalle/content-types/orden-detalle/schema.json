@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orden_detalles",
+  "info": {
+    "singularName": "orden-detalle",
+    "pluralName": "orden-detalles",
+    "displayName": "orden_detalle"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "cantidad": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "precio": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "subtotal": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "stock_ficticio": {
+      "type": "boolean",
+      "required": true
+    },
+    "snapshot_info_producto": {
+      "type": "string",
+      "required": true
+    },
+    "producto": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::producto.producto",
+      "inversedBy": "orden_detalles"
+    },
+    "orden": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::orden.orden",
+      "inversedBy": "orden_detalles"
+    }
+  }
+}

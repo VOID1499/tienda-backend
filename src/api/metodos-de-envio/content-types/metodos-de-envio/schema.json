@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "metodos_de_envios",
+  "info": {
+    "singularName": "metodos-de-envio",
+    "pluralName": "metodos-de-envios",
+    "displayName": "metodos_de_envio"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "activo": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "configuracion": {
+      "type": "json",
+      "private": true,
+      "required": true
+    },
+    "tarifa_fija": {
+      "type": "integer",
+      "min": 0
+    },
+    "informacion_adicional": {
+      "type": "text"
+    },
+    "url_logo": {
+      "type": "string"
+    },
+    "ordens": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::orden.orden",
+      "mappedBy": "metodos_de_envio"
+    }
+  }
+}

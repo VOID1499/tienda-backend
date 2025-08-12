@@ -1,0 +1,93 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ordens",
+  "info": {
+    "singularName": "orden",
+    "pluralName": "ordens",
+    "displayName": "orden"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true
+    },
+    "apellidos": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "direccion": {
+      "type": "string",
+      "required": true
+    },
+    "telefono": {
+      "type": "string",
+      "required": true
+    },
+    "costo_envio": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "subtotal": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "total": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "fecha_de_pago": {
+      "type": "datetime"
+    },
+    "estado": {
+      "type": "enumeration",
+      "required": true,
+      "default": "pendiente",
+      "enum": [
+        "pendiente",
+        "pagada",
+        "preparacion",
+        "enviada",
+        "cancelada"
+      ]
+    },
+    "payment_id": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "descuento": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "metodos_de_pago": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::metodos-de-pago.metodos-de-pago",
+      "inversedBy": "ordens"
+    },
+    "metodos_de_envio": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::metodos-de-envio.metodos-de-envio",
+      "inversedBy": "ordens"
+    },
+    "orden_detalles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::orden-detalle.orden-detalle",
+      "mappedBy": "orden"
+    }
+  }
+}

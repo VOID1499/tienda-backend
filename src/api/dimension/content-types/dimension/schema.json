@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dimensions",
+  "info": {
+    "singularName": "dimension",
+    "pluralName": "dimensions",
+    "displayName": "dimension"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "alto": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "largo": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "ancho": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "peso": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "productos": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::producto.producto",
+      "mappedBy": "dimension"
+    }
+  }
+}
