@@ -88,11 +88,15 @@ module.exports = {
 
       const responseData = await response.json();
 
-      if(responseData){
-        return responseData.status == "pending" ? true : false;
+
+      if(responseData.status == ""){
+        return "canceled"
       }
 
-      return false; 
+      //"pending -> pendiente de pago
+      //"done" -> pagada
+      //""   -> cobro cancelado
+      return responseData.status; 
 
       } catch (error) {
         console.error("Error consultando el estado de un cobro", error);

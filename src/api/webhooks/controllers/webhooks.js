@@ -14,7 +14,6 @@ module.exports = {
       
       await strapi.service("api::orden.orden").cambiarEstadoOrden(transactionId,"pagada");
 
-
       //204 no content
       ctx.send();
       

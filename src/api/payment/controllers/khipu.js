@@ -6,6 +6,7 @@ module.exports = {
   async khipu(ctx) {
     const data = ctx.request.body.data;
 
+    console.log(data)
     try {
 
       const metodoDeEnvio = await strapi.documents("api::metodos-de-envio.metodos-de-envio").findOne({
@@ -28,6 +29,7 @@ module.exports = {
       const response = await strapi.service("api::pasarelas.khipu").crearCobro(ordenCreada,metodoDePagoKhipu);
 
       console.log(response)
+
       await strapi.documents("api::orden.orden").update({
         documentId:ordenCreada.documentId,
         data:{

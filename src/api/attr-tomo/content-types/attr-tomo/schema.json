@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "attr_tomos",
+  "info": {
+    "singularName": "attr-tomo",
+    "pluralName": "attr-tomos",
+    "displayName": "attr_tomo"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "tomo": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "productos": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::producto.producto",
+      "mappedBy": "attr_tomo"
+    }
+  }
+}

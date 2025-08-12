@@ -373,6 +373,37 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAttrTomoAttrTomo extends Struct.CollectionTypeSchema {
+  collectionName: 'attr_tomos';
+  info: {
+    displayName: 'attr_tomo';
+    pluralName: 'attr-tomos';
+    singularName: 'attr-tomo';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::attr-tomo.attr-tomo'
+    > &
+      Schema.Attribute.Private;
+    productos: Schema.Attribute.Relation<'oneToMany', 'api::producto.producto'>;
+    publishedAt: Schema.Attribute.DateTime;
+    tomo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCategoriaCategoria extends Struct.CollectionTypeSchema {
   collectionName: 'categorias';
   info: {
@@ -682,9 +713,7 @@ export interface ApiOrdenOrden extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::orden-detalle.orden-detalle'
     >;
-    payment_id: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
+    payment_id: Schema.Attribute.String & Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
     subtotal: Schema.Attribute.Integer &
       Schema.Attribute.Required &
@@ -720,6 +749,10 @@ export interface ApiProductoProducto extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    attr_tomo: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::attr-tomo.attr-tomo'
+    >;
     categoria: Schema.Attribute.Relation<
       'manyToOne',
       'api::categoria.categoria'
@@ -765,11 +798,12 @@ export interface ApiProductoProducto extends Struct.CollectionTypeSchema {
           min: 0;
         },
         number
-      >;
+      > &
+      Schema.Attribute.DefaultTo<0>;
     producto: Schema.Attribute.Relation<'manyToOne', 'api::producto.producto'>;
     productos: Schema.Attribute.Relation<'oneToMany', 'api::producto.producto'>;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'nombre'> & Schema.Attribute.Required;
+    slug: Schema.Attribute.UID<'nombre'>;
     stock_disponible: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -797,6 +831,7 @@ export interface ApiProductoProducto extends Struct.CollectionTypeSchema {
         number
       > &
       Schema.Attribute.DefaultTo<0>;
+    tipo: Schema.Attribute.Enumeration<['simple', 'variable']>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1343,6 +1378,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::attr-tomo.attr-tomo': ApiAttrTomoAttrTomo;
       'api::categoria.categoria': ApiCategoriaCategoria;
       'api::dimension.dimension': ApiDimensionDimension;
       'api::metodos-de-envio.metodos-de-envio': ApiMetodosDeEnvioMetodosDeEnvio;

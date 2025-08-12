@@ -134,7 +134,6 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
     
     }
 
-
     // Calculos de orden
 
      const {volumenTotalCm3, volumenTotalLitros,pesoTotalKg }  = calcularVolumenYPeso(productosParaDetalleOden)
@@ -147,6 +146,7 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
 
     let ordenCreada;
 
+    console.log
     try {
       await strapi.db.transaction(async ({ trx, onRollback }) => {
         onRollback(() => {
@@ -178,7 +178,7 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
             email: orden.email,
             telefono: orden.telefono,
             direccion: orden.direccion,
-              metodos_de_pago: {
+            metodos_de_pago: {
               connect: { documentId: metodoDePago.documentId }
             }
           },
@@ -217,23 +217,12 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
 
     try {
       await strapi.db.transaction(async ({ onCommit, onRollback }) => {
-          // It will implicitly use the transaction
 
-          const ordenSinActualizar = await strapi.documents("api::orden.orden").findOne({
+          const ordenEncontrada = await strapi.documents("api::orden.orden").findOne({
             documentId:documentId
           })
-         
-          if(ordenSinActualizar.estado == "pendiente"){
-
-            await strapi.documents("api::orden.orden").update({
-              documentId:documentId,
-              data:{
-                "estado":estado
-                }
-            })
-
-
-            const detallesOrdenConStockReal = await strapi.documents("api::orden-detalle.orden-detalle").findMany({
+      
+          const detallesOrdenConStockReal = await strapi.documents("api::orden-detalle.orden-detalle").findMany({
               filters:{
                 stock_ficticio:false,
                 orden: {
@@ -245,32 +234,67 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
                   fields:["documentId","stock_disponible","stock_total","stock_reservado"]
                 }
               }
-            });
+          });
           
-            for(const detalle of detallesOrdenConStockReal){
-              const nuevoStocResevado = detalle.producto.stock_reservado - detalle.cantidad;
-              const nuevoStockTotal = detalle.producto.stock_total - detalle.cantidad;
-              console.log(nuevoStocResevado,nuevoStockTotal)
-              await strapi.documents("api::producto.producto").update({
-                documentId:detalle.producto.documentId,
-                data:{
-                  stock_reservado:nuevoStocResevado,
-                  stock_total:nuevoStockTotal
-                },
-                status:"published"
-              })
 
+            if (
+              (estado === "pagada" && ordenEncontrada.estado === "pendiente") ||
+              (estado === "cancelada" && ordenEncontrada.estado === "pendiente") ||
+              (estado === "enviada" && ordenEncontrada.estado === "pagada")
+            ) {
+              await strapi.documents("api::orden.orden").update({
+                documentId,
+                data: { estado }
+              });
             }
-          }
+            
+            if(estado == "pagada" && ordenEncontrada.estado == "pendiente"){
+         
+            }
+
+            if(estado == "cancelada" && ordenEncontrada.estado == "pendiente"){
+          
+              for(const detalle of detallesOrdenConStockReal){
+                  const stock_disponible = detalle.producto.stock_disponible + detalle.cantidad;
+                  const stock_reservado = detalle.producto.stock_reservado - detalle.cantidad;
+                  await strapi.documents("api::producto.producto").update({
+                    documentId:detalle.producto.documentId,
+                    data:{
+                      stock_disponible:stock_disponible,
+                      stock_reservado:stock_reservado,
+                    },
+                    status:"published"
+                  })
+              }
+            }
+
+            if(estado == "enviada" && ordenEncontrada.estado == "pagada"){
+            
+              for(const detalle of detallesOrdenConStockReal){
+                const stock_reservado = detalle.producto.stock_reservado - detalle.cantidad;
+                const stock_total = stock_reservado + detalle.producto.stock_disponible;
+                await strapi.documents("api::producto.producto").update({
+                  documentId:detalle.producto.documentId,
+                  data:{
+                    stock_total:stock_total,
+                    stock_reservado:stock_reservado,
+                  },
+                  status:"published"
+                })
+            }
+            }
+
 
           onCommit(() => {
           });
-
+          
           onRollback(() => {
+            console.log("roll back");
           });
 
         });
     }catch (error) {
+      console.log(error)
       throw new ApplicationError("Error al actualizar el estado de la orden",{error});
     }
 
@@ -280,27 +304,53 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
   async eliminarOrdenesPendientes(){
 
     try {
+          const hace24Horas = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // utc
+          const haceUnMinuto = new Date(Date.now() - 1 * 60 * 1000).toISOString();
 
          // 1. Buscar órdenes pendientes
           const ordenesPendientes = await strapi.documents("api::orden.orden").findMany({
-            filters: { estado: "pendiente" },
-            populate: { metodos_de_pago: true, detalles: true }
+            filters: { 
+              estado: "pendiente",
+              createdAt:{
+                $lte:haceUnMinuto
+              }
+               
+            },
+            populate: { 
+              metodos_de_pago: true,
+            }
           });
 
-          let ahora = new Date();
+          const responses = await Promise.allSettled(
+             ordenesPendientes.map((orden) =>
+               strapi.service("api::pasarelas.payment-dispatcher").verificarEstadoDeCobro(orden)
+             )
+           );
 
-          // 2. Verificar estado fuera de la transacción
+          const ordenesConEstadoDeCobroReal = responses
+          .map((res, i) => ({ res, orden: ordenesPendientes[i] }))
+          .filter(({ res }) => res.status === "fulfilled")
+          .map(({ orden ,res}) =>{
+            return { orden, res}
+          });
+
           
-        await strapi.db.transaction(async ({ onCommit, onRollback }) => {
+          for(const item of ordenesConEstadoDeCobroReal){
 
-         
-          onCommit(() => {
-          });
+            //cobro real pendiente o cancelado
+            if(item.res.value == "pending" || item.res.value == "canceled"){
+              
+             await this.cambiarEstadoOrden(item.orden.documentId,"cancelada");
+            }
 
-          onRollback(() => {
-          });
+            //cobro real pagado
+            if(item.res.value == "done"){
+             await this.cambiarEstadoOrden(item.orden.documentId,"pagada")
+            }
 
-        });
+          
+          }  
+
 
     }catch (error) {
       throw new ApplicationError("Error al eliminar ordenes pendientes",{error});

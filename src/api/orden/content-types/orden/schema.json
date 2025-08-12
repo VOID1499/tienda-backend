@@ -31,6 +31,18 @@
       "type": "string",
       "required": true
     },
+    "estado": {
+      "type": "enumeration",
+      "required": true,
+      "default": "pendiente",
+      "enum": [
+        "pendiente",
+        "pagada",
+        "preparacion",
+        "enviada",
+        "cancelada"
+      ]
+    },
     "costo_envio": {
       "type": "integer",
       "required": true,
@@ -49,21 +61,9 @@
     "fecha_de_pago": {
       "type": "datetime"
     },
-    "estado": {
-      "type": "enumeration",
-      "required": true,
-      "default": "pendiente",
-      "enum": [
-        "pendiente",
-        "pagada",
-        "preparacion",
-        "enviada",
-        "cancelada"
-      ]
-    },
     "payment_id": {
       "type": "string",
-      "required": true,
+      "required": false,
       "unique": true
     },
     "descuento": {
