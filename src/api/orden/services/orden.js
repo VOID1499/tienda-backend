@@ -339,7 +339,7 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
 
             //cobro real pendiente -> se cancela el cobro real y la orden queda candelada
             if(item.res.value == "pending"){
-             await strapi.service("api::pasarelas.khipu").cancelarCobro(item.orden); 
+             await strapi.service("api::pasarelas.payment-dispatcher").cancelarCobro(item.orden); 
              await this.cambiarEstadoOrden(item.orden.documentId,"cancelada");
             }
 
