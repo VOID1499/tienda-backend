@@ -373,6 +373,36 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAttrColorAttrColor extends Struct.CollectionTypeSchema {
+  collectionName: 'attr_colors';
+  info: {
+    displayName: 'attr_color';
+    pluralName: 'attr-colors';
+    singularName: 'attr-color';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    color: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::attr-color.attr-color'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiAttrTomoAttrTomo extends Struct.CollectionTypeSchema {
   collectionName: 'attr_tomos';
   info: {
@@ -1378,6 +1408,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::attr-color.attr-color': ApiAttrColorAttrColor;
       'api::attr-tomo.attr-tomo': ApiAttrTomoAttrTomo;
       'api::categoria.categoria': ApiCategoriaCategoria;
       'api::dimension.dimension': ApiDimensionDimension;

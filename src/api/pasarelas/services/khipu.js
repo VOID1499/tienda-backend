@@ -19,7 +19,7 @@ module.exports = {
 
     // Luego usarlo en el objeto data:
     const data = {
-      amount: ordenCreada.subtotal,
+      amount: ordenCreada.total,
       currency: "CLP",
       subject: `Orden ID ${ordenCreada.documentId}`,
       transaction_id: ordenCreada.documentId,

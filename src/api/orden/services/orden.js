@@ -57,7 +57,8 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
       if (productoActual.tipo == null) {
         productoActual.precio = productoActual.precio !== 0 ? productoActual.precio: productoActual.producto?.precio;
         productoActual.dimension = productoActual.producto?.dimension; 
-        const descuento_ = productoActual.descuento_porcentaje == null? (productoActual.producto?.descuento_porcentaje ?? 0): productoActual.descuento_porcentaje;productoActual.descuento_porcentaje = descuento_;
+        const descuento_ = productoActual.descuento_porcentaje == null? (productoActual.producto?.descuento_porcentaje ?? 0): productoActual.descuento_porcentaje;
+        productoActual.descuento_porcentaje = descuento_;
 
          const info = atributosRelacion.reduce((acc, attr, index) => {
             const limpio = attr.replace('attr_', '');
@@ -146,7 +147,6 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
 
     let ordenCreada;
 
-    console.log
     try {
       await strapi.db.transaction(async ({ trx, onRollback }) => {
         onRollback(() => {
