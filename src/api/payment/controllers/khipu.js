@@ -52,7 +52,8 @@ module.exports = {
           data:{
             error: {
               message: error.message,
-              detalles: error.details,
+              details: error.details,
+              code:error.details.code
             }
           }
         };

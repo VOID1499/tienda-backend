@@ -180,6 +180,9 @@ module.exports = createCoreService('api::orden.orden', ({ strapi }) => ({
             direccion: orden.direccion,
             metodos_de_pago: {
               connect: { documentId: metodoDePago.documentId }
+            },
+            metodos_de_envio:{
+              connect:{ documentId:metodoDeEnvio.documentId}
             }
           },
           transacting: trx,
